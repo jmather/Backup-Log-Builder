@@ -1,0 +1,24 @@
+<style>
+table {
+       	border-collapse: collapse;
+}
+td + td {
+        text-align: center;
+}
+td span {
+        display: inline-block;
+        text-align: center;
+        border: 1px solid black;
+        padding: 2px;
+        padding-left: 3px;
+        padding-rigth: 5px;
+        background-color: #ffffff;
+}
+tr.odd {
+        background-color: #dddddd;
+}
+td span.should_use {
+        background-color: #aaaaaa;
+}
+</style>
+
