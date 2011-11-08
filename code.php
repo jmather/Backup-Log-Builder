@@ -1,12 +1,5 @@
 <?php
 
-// More weekday tapes? Add them here!
-$weekdays = array('A', 'B');
-$weekdays_count = count($weekdays);
-
-// More friday tapes? Add them here!
-$fridays = array(1, 2, 3, 4, 5);
-$fridays_count = count($fridays);
 
 function findMonday($time)
 {
@@ -17,14 +10,45 @@ function findMonday($time)
 	return $time;
 }
 
-$current_week = date('W');
-
-for ($week_i = $current_week; $week_i < 53; $week_i++)
+if (!isset($_GET['start']))
 {
-	// start with the "fuzzy" current time
-	$base_ts = strtotime('+'.($week_i - $current_week).' weeks');
+    $current_week = date('W');
+    $current_timestamp = time();
+} else {
+    $current_week = date('W', strtotime($_GET['start']));
+    $current_timestamp = strtotime($_GET['start']);
+}
+
+$end_timestamp = strtotime((date('Y', $current_timestamp)+1).'-01-01');
+
+$counter = 0;
+
+for ($week_i = $current_week; $week_i <= 53; $week_i++)
+{
+    $counter++;
+    // start with the "fuzzy" current time
+    $base_ts = strtotime('+'.($week_i - $current_week).' weeks', $current_timestamp);
+
+    $monday = findMonday($base_ts);
+    if ($monday < strtotime((date('Y', $current_timestamp)+1).'-01-01'))
+        print_week_block($base_ts);
+    if ($counter % 4 == 0)
+        echo '<div style="page-break-after: always;">&nbsp;</div>';
+}
+
+
+function print_week_block($week_timestamp) {
+
+    // More weekday tapes? Add them here!
+    $weekdays = array('A', 'B');
+    $weekdays_count = count($weekdays);
+
+    // More friday tapes? Add them here!
+    $fridays = array(1, 2, 3, 4, 5);
+    $fridays_count = count($fridays);
+
 	// Now we will know monday.
-	$monday_ts = findMonday($base_ts);
+	$monday_ts = findMonday($week_timestamp);
 
 	// Just because I'm paranoid.
 	$week = date('W', $monday_ts);
@@ -43,7 +67,10 @@ for ($week_i = $current_week; $week_i < 53; $week_i++)
 	if (date('m', $friday_ts) != $next_friday_month)
 		$friday_tape = null;
 
+
 ?>
+<div style="page-break-inside: avoid;">
+
 <table width="600" style="margin-left: 50px;">
 	<caption>Backup Tape Schedule - Week <?php echo $week; ?> - <?php echo date('m/d/Y', $monday_ts); ?> to <?php echo date('m/d/Y', $friday_ts); ?></caption>
 	<thead>
@@ -59,7 +86,7 @@ for ($week_i = $current_week; $week_i < 53; $week_i++)
 	<tbody>
 <?php for($i = 1; $i < 5; $i++): ?>
 		<tr<?php if ($i % 2 == 0): ?> class="odd"<?php endif; ?>>
-			<td><?php echo date('l, F j', strtotime('+'.($i - 1).' day', $monday_ts)); ?></td>
+			<td><?php echo date('D, F j', strtotime('+'.($i - 1).' day', $monday_ts)); ?></td>
 <?php for($a = 1; $a < $i; $a++): ?>
 <?php foreach($weekdays as $tape): ?>
 			<td><span><?php echo $tape; ?></span></td>
@@ -80,7 +107,7 @@ for ($week_i = $current_week; $week_i < 53; $week_i++)
 		</tr>
 <?php endfor; ?>
 		<tr>
-			<td><?php echo date('l, F j', strtotime('+'.($i - 1).' day', $monday_ts)); ?></td>
+			<td><?php echo date('D, F j', strtotime('+'.($i - 1).' day', $monday_ts)); ?></td>
 <?php for($a = 1; $a < 5; $a++): ?>
 <?php foreach($weekdays as $tape): ?>
 			<td><span><?php echo $tape; ?></span></td>
@@ -94,7 +121,7 @@ for ($week_i = $current_week; $week_i < 53; $week_i++)
 	</tbody>
 </table>
 <br />
+</div>
 
 <?php
-
 }
